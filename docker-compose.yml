@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  project:
+    build: .
+    image: mycode
+    container_name: my-django-app
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mysitedb
+    ports:
+      - "3307:3306"

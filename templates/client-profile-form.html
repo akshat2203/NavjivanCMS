@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Profile Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+    ul.errorlist {
+        list-style: none;
+        padding: 0 0 0 10px;
+        color: red;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    img#photo-preview {
+        width: 140px;
+        height: 100%;
+    }
+
+    img#signature-preview {
+        height: 100%;
+        width: 140px;
+    }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Client Profile Form</h1>
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Surname</label>
+                        {{ form.surname }}
+                    </div>
+                    {{ form.surname.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_first_name">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    {{ form.first_name.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_last_name">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                    {{ form.last_name.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_gender">Gender</label>
+                        {{ form.gender }}
+                    </div>
+                    {{ form.gender.errors }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_fathers_name">Father's Name</label>
+                        {{ form.fathers_name }}
+                    </div>
+                    {{ form.fathers_name.errors }}
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_mothers_name">Mother's Name</label>
+                        {{ form.mothers_name }}
+                    </div>
+                    {{ form.mothers_name.errors }}
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_marital_status">Marital Status</label>
+                        {{ form.marital_status }}
+                    </div>
+                    {{ form.marital_status.errors }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_cast">Cast</label>
+                        {{ form.cast }}
+                    </div>
+                    {{ form.cast.errors }}
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_mobile_number">Mobile Number</label>
+                        {{ form.mobile_number }}
+                    </div>
+                    {{ form.mobile_number.errors }}
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label for="id_email">Email</label>
+                        {{ form.email }}
+                    </div>
+                    {{ form.email.errors }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_photo">Photo</label>
+                        {{ form.photo }}
+                    </div>
+                    {{ form.photo.errors }}
+                </div>
+                <div class="col-md-6 text-center">
+                    <img id="photo-preview" src="#" alt="Preview" style="max-width: 100%; display: none;">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_signature">Signature</label>
+                        {{ form.signature }}
+                    </div>
+                    {{ form.signature.errors }}
+                </div>
+                <div class="col-md-6 text-center">
+                    <img id="signature-preview" src="#" alt="Preview" style="max-width: 100%; display: none;">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="id_address">Address</label>
+                        {{ form.address }}
+                    </div>
+                    {{ form.address.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_city">City</label>
+                        {{ form.city }}
+                    </div>
+                    {{ form.city.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_taluka">Taluka</label>
+                        {{ form.taluka }}
+                    </div>
+                    {{ form.taluka.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_district">District</label>
+                        {{ form.district }}
+                    </div>
+                    {{ form.district.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_pincode">Pincode</label>
+                        {{ form.pincode }}
+                    </div>
+                    {{ form.pincode.errors }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_height">Height</label>
+                        {{ form.height }}
+                    </div>
+                    {{ form.height.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_weight">Weight</label>
+                        {{ form.weight }}
+                    </div>
+                    {{ form.weight.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_chest">Chest</label>
+                        {{ form.chest }}
+                    </div>
+                    {{ form.chest.errors }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_edu_qualification">Edu Qualification</label>
+                        {{ form.edu_qualification }}
+                    </div>
+                    {{ form.edu_qualification.errors }}
+                </div>
+            </div>
+
+
+
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $(document).ready(function() {
+            $('#id_photo, #id_signature').change(function() {
+                const input = this;
+                const previewId = input.id === 'id_photo' ? 'photo-preview' : 'signature-preview';
+                const preview = $('#' + previewId);
+                const file = input.files && input.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+                if (file) {
+                    if (!allowedTypes.includes(file.type)) {
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.attr('src', e.target.result).show();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.hide().attr('src', '#');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
