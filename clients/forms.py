@@ -9,6 +9,7 @@ class ClientProfileForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
         self.fields['address'].widget = forms.Textarea(attrs={'class': 'form-control', 'rows': 4})
+        self.fields['date_of_birth'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
 
     class Meta:
         model = ClientProfile

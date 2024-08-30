@@ -13,11 +13,18 @@ services:
       - mysql
 
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: mysql-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mysitedb
+      MYSQL_ROOT_PASSWORD: root@db
+      MYSQL_DATABASE: navjivan-db
+      MYSQL_USER: akshat
+      MYSQL_PASSWORD: akshat@db
     ports:
       - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

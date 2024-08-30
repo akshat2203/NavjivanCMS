@@ -3,15 +3,15 @@ FROM python:3.10-slim
 
 # Update package lists and install system dependencies
 RUN apt-get update && apt-get install -y \
-    python-dev \
+    python3-dev \
     build-essential \
     libssl-dev \
     libffi-dev \
     libxmlsec1-dev \
     pkg-config \
     gettext \
-    vim
-
+    vim \
+    default-libmysqlclient-dev
 
 # Set the working directory in the container
 WORKDIR /app
@@ -22,14 +22,6 @@ COPY . .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run Django migrations
-RUN python manage.py migrate
-
-# Create a superuser
-RUN python manage.py createsuperuser --noinput \
-    --username $SUPER_USER \
-    --email $SUPER_USER_EMAIL \
-    --password $SUPERUSER_PASSWORD
 
 # Expose port 8000 to the outside world
 EXPOSE 8000
