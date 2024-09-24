@@ -12,8 +12,6 @@ services:
       MYSQL_PASSWORD: akshat@db
     ports:
       - "3307:3306"
-    volumes:
-      - ./my.cnf:/etc/mysql/conf.d/my.cnf
 
   project:
     build: .
