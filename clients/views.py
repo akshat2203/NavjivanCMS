@@ -2,6 +2,11 @@ from django.views.generic import FormView, TemplateView
 from django.urls import reverse_lazy
 from .forms import ClientProfileForm
 from django.contrib.auth.views import LoginView
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.info("clients.views module loaded — live-reload test")
 
 
 class SuperuserLoginView(LoginView):
@@ -20,3 +25,5 @@ class ClientProfileCreateView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+# live-reload comment toggle

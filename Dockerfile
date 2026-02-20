@@ -1,30 +1,32 @@
-# Use the official Python image as the base image
 FROM python:3.10-slim
 
-# Update package lists and install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3-dev \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    libxmlsec1-dev \
-    pkg-config \
-    gettext \
-    vim \
-    default-libmysqlclient-dev
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Set the working directory in the container
+# Install only required system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    libmagic1 \
+    libmagic-dev \
+    file \
+    gettext \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Copy the rest of the application code into the container
+COPY requirements.txt .
+
+# DO NOT use ensurepip
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN useradd -ms /bin/bash appuser && chown -R appuser:appuser /app
+USER appuser
 
-
-# Expose port 8000 to the outside world
 EXPOSE 8000
 
-# Command to run the Django development server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

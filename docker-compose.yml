@@ -1,25 +1,35 @@
-version: "3"
-
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql-db
+  db:
+    image: postgres:15
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root@db
-      MYSQL_DATABASE: navjivan-db
-      MYSQL_USER: akshat
-      MYSQL_PASSWORD: akshat@db
-    ports:
-      - "3307:3306"
-
-  project:
-    build: .
-    image: mycode
-    container_name: my-django-app
+      POSTGRES_USER: navjivan
+      POSTGRES_PASSWORD: navjivan
+      POSTGRES_DB: navjivan
     volumes:
-      - .:/app
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app:cached
     ports:
       - "8000:8000"
+    # Use the project's env file located in the navjivan app directory
+    # (there is a navjivan/.env in the repo). This avoids a missing .env at the repo root.
+    env_file:
+      - ./navjivan/.env
     depends_on:
-      - mysql
+      - db
+      - redis
+
+volumes:
+  db_data:
