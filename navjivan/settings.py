@@ -12,10 +12,12 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+env_path = find_dotenv(filename='.env')
+if env_path:
+    load_dotenv(env_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,7 +44,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'clients'
+    'clients',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    'accounts',
+    'profiles',
+    'education',
+    'government_ids',
+    'documents',
+    'audit_logs',
+    'core',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -77,12 +90,12 @@ WSGI_APPLICATION = 'navjivan.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'navjivan'),
+        'USER': os.getenv('DB_USER', 'navjivan'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'navjivan'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': int(os.getenv('DB_PORT', 5432)),
     }
 }
 
@@ -137,3 +150,69 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Custom user model
+AUTH_USER_MODEL = 'accounts.User'
+
+# DRF configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Simple JWT (can be expanded in prod settings)
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ALGORITHM': 'HS256',
+}
+
+# Caching (Redis) - use django-redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+# Storage (S3) configuration placeholders; dev can use FileSystemStorage while prod should set AWS_* env vars
+DEFAULT_FILE_STORAGE = os.getenv('DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
+AWS_S3_BUCKET_NAME = os.getenv('AWS_S3_BUCKET_NAME', '')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', '')
+AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
+
+# Field encryption key (base64 encoded) - production MUST set this
+FIELD_ENCRYPTION_KEY = os.getenv('FIELD_ENCRYPTION_KEY', None)
+if not FIELD_ENCRYPTION_KEY:
+    # Warn in dev but don't crash; production should enforce this
+    import warnings
+    warnings.warn('FIELD_ENCRYPTION_KEY is not set. Sensitive fields will not be encrypted.')
+
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'NavjivanCMS API',
+    'DESCRIPTION': 'Secure Digital Profile Vault',
+    'VERSION': '1.0.0',
+}
+
+REST_FRAMEWORK.update({
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': os.getenv('DRF_THROTTLE_USER', '200/min'),
+        'anon': os.getenv('DRF_THROTTLE_ANON', '20/min'),
+    },
+    'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
+})

@@ -84,6 +84,29 @@ python manage.py runserver
 ```
 Now, you can access the application at http://127.0.0.1:8000/.
 
+## Development (Docker with live-reload)
+
+We provide a development compose file which mounts your local source into the container and runs the Django development server with auto-reload support.
+
+Start the dev environment:
+
+```bash
+# build and start services
+docker compose -f docker-compose.yml up --build
+```
+
+Edit Python files locally and the Django autoreloader (helped by `watchdog`) will restart the server inside the container so changes reflect in near real-time. If file changes are not detected on Linux hosts, increase inotify watchers:
+
+```bash
+# on host
+sudo sysctl fs.inotify.max_user_watches=524288
+echo "fs.inotify.max_user_watches=524288" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+```
+
+Notes:
+- This mode is intended for local development only. Do NOT use volume mounts in production images.
+- For production builds, use `docker-compose.yml` and run via your CI/CD with a production-ready WSGI server like Gunicorn.
+
 ### Contributing
 If you'd like to contribute to this project, feel free to submit a pull request or open an issue.
-
