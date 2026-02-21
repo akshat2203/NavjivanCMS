@@ -32,4 +32,4 @@ django-storages==1.13.2
 # Use psycopg2-binary for Postgres
 psycopg2-binary==2.9.10
 python-magic==0.4.27
-
+gunicorn
