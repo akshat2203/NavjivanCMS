@@ -36,3 +36,23 @@ class GovernmentIDService:
             return None
         return pan.masked()
 
+    @staticmethod
+    def delete_aadhaar(user, actor=None):
+        aadhaar = Aadhaar.objects.filter(user=user).first()
+        if aadhaar:
+            last4 = aadhaar.last4
+            aadhaar.delete()
+            AuditService.log(actor or user, user, 'aadhaar.delete', f'Deleted Aadhaar last4={last4}')
+            return True
+        return False
+
+    @staticmethod
+    def delete_pan(user, actor=None):
+        pan = PAN.objects.filter(user=user).first()
+        if pan:
+            last4 = pan.last4
+            pan.delete()
+            AuditService.log(actor or user, user, 'pan.delete', f'Deleted PAN last4={last4}')
+            return True
+        return False
+

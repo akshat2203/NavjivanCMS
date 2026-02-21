@@ -32,10 +32,52 @@ SECRET_KEY = 'django-insecure---s7#-6#(o46#g0*4k2k@_r^1f$%pxphphb_30mj+rfw^l%f7q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '0.0.0.0,localhost,127.0.0.1').split(',')
 
 # Application definition
+# ... (existing code omitted for brevity in replace_file_content, but I will provide full block)
+
+# Production-ready Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
+
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'NavjivanCMS API',
+    'DESCRIPTION': 'Secure Digital Profile Vault',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -91,11 +133,11 @@ WSGI_APPLICATION = 'navjivan.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'navjivan'),
-        'USER': os.getenv('DB_USER', 'navjivan'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'navjivan'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': int(os.getenv('DB_PORT', 5432)),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': int(os.getenv('DB_PORT')),
     }
 }
 
@@ -163,6 +205,15 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': os.getenv('DRF_THROTTLE_USER', '200/min'),
+        'anon': os.getenv('DRF_THROTTLE_ANON', '20/min'),
+    },
+    'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
 }
 
 # Simple JWT (can be expanded in prod settings)
@@ -198,21 +249,51 @@ if not FIELD_ENCRYPTION_KEY:
     import warnings
     warnings.warn('FIELD_ENCRYPTION_KEY is not set. Sensitive fields will not be encrypted.')
 
-# drf-spectacular settings
+# drf-spectacular settings for Pro-level API Documentation
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'NavjivanCMS API',
-    'DESCRIPTION': 'Secure Digital Profile Vault',
+    'TITLE': '🛡️ NavjivanCMS Secure API',
+    'DESCRIPTION': (
+        '## Production-Grade Secure Digital Profile Vault\n\n'
+        'This API provides secure storage for sensitive identity and education data. '
+        'Leveraging AES-GCM encryption, Service Layer architecture, and detailed audit trails.\n\n'
+        '**Key Features:**\n'
+        '- 🔐 Field-level Encryption (Aadhaar/PAN)\n'
+        '- 📝 Comprehensive Audit Logging\n'
+        '- ☁️ AWS S3 Document Storage\n'
+        '- ⚡ Redis Caching for Performance'
+    ),
     'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    
+    # Swagger UI Customization (Pro Look)
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'defaultModelsExpandDepth': -1, # Cleaner view by hiding models initially
+        'filter': True,                 # Enable quick search within endpoints
+    },
+    
+    # Redoc Customization (Clean, Modern Docs)
+    'REDOC_SETTINGS': {
+        'theme': {
+            'colors': {
+                'primary': {'main': '#2196f3'},
+            },
+            'typography': {
+                'fontFamily': 'Roboto, sans-serif',
+            },
+        },
+    },
+
+    # RapiDoc Customization (Ultra-modern interaction)
+    'RAPIDOC_SETTINGS': {
+        'theme': 'dark',
+        'schema-style': 'table',
+        'render-style': 'focused',
+        'bg-color': '#0d1117',
+        'text-color': '#c9d1d9',
+        'primary-color': '#58a6ff',
+    },
 }
 
-REST_FRAMEWORK.update({
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.UserRateThrottle',
-        'rest_framework.throttling.AnonRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'user': os.getenv('DRF_THROTTLE_USER', '200/min'),
-        'anon': os.getenv('DRF_THROTTLE_ANON', '20/min'),
-    },
-    'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
-})
