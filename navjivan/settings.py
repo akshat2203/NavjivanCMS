@@ -32,7 +32,8 @@ SECRET_KEY = 'django-insecure---s7#-6#(o46#g0*4k2k@_r^1f$%pxphphb_30mj+rfw^l%f7q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '0.0.0.0,localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host]
 
 # Application definition
 # ... (existing code omitted for brevity in replace_file_content, but I will provide full block)
