@@ -1,35 +1,64 @@
+version: '3.8'
+
 services:
+
   db:
     image: postgres:15
+    container_name: postgres_db
     restart: always
-    environment:
-      POSTGRES_USER: navjivan
-      POSTGRES_PASSWORD: navjivan
-      POSTGRES_DB: navjivan
+    env_file:
+      - ./navjivan/.env
     volumes:
       - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
 
   redis:
     image: redis:7
-    ports:
-      - "6379:6379"
+    container_name: redis_server
+    restart: always
+    expose:
+      - "6379"
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    container_name: django_app
+    command: gunicorn navjivan.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - .:/app:cached
-    ports:
-      - "8000:8000"
-    # Use the project's env file located in the navjivan app directory
-    # (there is a navjivan/.env in the repo). This avoids a missing .env at the repo root.
+      - .:/app
     env_file:
       - ./navjivan/.env
     depends_on:
       - db
       - redis
+    expose:
+      - "8000"
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_server
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/app
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins_server
+    restart: always
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   db_data:
+  jenkins_home:
