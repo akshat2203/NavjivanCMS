@@ -1,5 +1,6 @@
 from .models import Document
 from django.core.exceptions import ValidationError
+from audit_logs.services import AuditService
 import magic
 
 
@@ -9,7 +10,7 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
 class DocumentService:
     @staticmethod
-    def validate_and_create(user, uploaded_file, name=None):
+    def validate_and_create(user, uploaded_file, name=None, actor=None):
         # Validate size
         if uploaded_file.size > MAX_FILE_SIZE:
             raise ValidationError('File too large')
@@ -27,5 +28,14 @@ class DocumentService:
             raise ValidationError('Invalid file type')
 
         doc = Document.objects.create(user=user, name=name or uploaded_file.name, file=uploaded_file, content_type=content_type, size=uploaded_file.size)
+        AuditService.log(actor or user, user, 'document.upload', f'Uploaded document: {doc.name}')
         return doc
+
+    @staticmethod
+    def delete_document(document, actor=None):
+        user = document.user
+        name = document.name
+        doc_id = document.id
+        document.delete()
+        AuditService.log(actor or user, user, 'document.delete', f'Deleted document id={doc_id} name={name}')
 

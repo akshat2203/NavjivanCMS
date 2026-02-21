@@ -19,8 +19,13 @@ class DocumentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # serializer.validated_data contains no file; handle via request.FILES
         file_obj = self.request.FILES.get('file')
+        name = self.request.data.get('name')
         if not file_obj:
+            from rest_framework import serializers
             raise serializers.ValidationError('file is required')
-        doc = DocumentService.validate_and_create(self.request.user, file_obj)
+        doc = DocumentService.validate_and_create(self.request.user, file_obj, name=name, actor=self.request.user)
         serializer.instance = doc
         return doc
+
+    def perform_destroy(self, instance):
+        DocumentService.delete_document(instance, actor=self.request.user)

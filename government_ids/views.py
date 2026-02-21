@@ -35,6 +35,20 @@ class AadhaarViewSet(viewsets.ViewSet):
         obj = GovernmentIDService.set_aadhaar(request.user, aadhaar, issued_at=issued_at, actor=request.user)
         return Response({'id': obj.id, 'masked': obj.masked()}, status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, pk=None):
+        # pk=me or user_id
+        if pk in (None, 'me'):
+            target_user = request.user
+        else:
+            if not request.user.is_staff:
+                return Response({'detail': 'forbidden'}, status=status.HTTP_403_FORBIDDEN)
+            target_user = get_object_or_404(User, pk=pk)
+        
+        deleted = GovernmentIDService.delete_aadhaar(target_user, actor=request.user)
+        if deleted:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 class PANViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
@@ -57,3 +71,16 @@ class PANViewSet(viewsets.ViewSet):
             return Response({'detail': 'pan is required'}, status=status.HTTP_400_BAD_REQUEST)
         obj = GovernmentIDService.set_pan(request.user, pan, actor=request.user)
         return Response({'id': obj.id, 'masked': obj.masked()}, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        if pk in (None, 'me'):
+            target_user = request.user
+        else:
+            if not request.user.is_staff:
+                return Response({'detail': 'forbidden'}, status=status.HTTP_403_FORBIDDEN)
+            target_user = get_object_or_404(User, pk=pk)
+
+        deleted = GovernmentIDService.delete_pan(target_user, actor=request.user)
+        if deleted:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
