@@ -30,7 +30,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install only runtime dependencies (no build tools)
+# Install runtime dependencies only
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libmagic1 \
@@ -44,14 +44,25 @@ COPY requirements.txt .
 RUN pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir /wheels/*
 
+# Copy project
 COPY . .
 
+# -------------------------
 # Create non-root user
-RUN useradd -ms /bin/bash appuser && \
+# -------------------------
+RUN useradd -ms /bin/bash appuser
+
+# Create static & media directories
+RUN mkdir -p /app/staticfiles /app/media && \
     chown -R appuser:appuser /app
 
 USER appuser
 
 EXPOSE 8000
 
-CMD ["gunicorn", "navjivan.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
+# Low RAM optimized gunicorn config
+CMD ["gunicorn", "navjivan.wsgi:application", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "2", \
+     "--threads", "2", \
+     "--timeout", "120"]
