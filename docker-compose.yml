@@ -2,51 +2,34 @@ version: '3.8'
 
 services:
 
-  db:
-    image: postgres:15
-    container_name: postgres_db
-    restart: always
-    env_file:
-      - ./navjivan/.env
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    expose:
-      - "5432"
-
   redis:
-    image: redis:7
+    image: redis:7-alpine
     container_name: redis_server
     restart: always
     expose:
       - "6379"
+    command: redis-server --save "" --appendonly no
 
   web:
     build: .
     container_name: django_app
-    command: gunicorn navjivan.wsgi:application --bind 0.0.0.0:8000
-    volumes:
-      - .:/app
+    command: gunicorn navjivan.wsgi:application --bind 0.0.0.0:8000 --workers=2 --threads=2
     env_file:
       - ./navjivan/.env
     depends_on:
-      - db
       - redis
     expose:
       - "8000"
     restart: always
 
   nginx:
-    image: nginx:latest
+    image: nginx:alpine
     container_name: nginx_server
     restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - .:/app
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - web
-
-volumes:
-  db_data:
