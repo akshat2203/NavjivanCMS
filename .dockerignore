@@ -14,7 +14,5 @@ dist/
 node_modules/
 .idea/
 .vscode/
-media/
-static/
 .env
 
