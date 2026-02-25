@@ -56,7 +56,7 @@ pip install -r requirements.txt
 ```
 
 ### 6. Configure environment variables
-Create a `.env` file in the root directory `navjivan` and set up the required environment variables for your database, secret key, etc.
+Create a `.env` file in the root directory of the project (At the same level of `manage.py` file) and set up the required environment variables for your database, secret key, etc.
 
 Example `.env`:
 
