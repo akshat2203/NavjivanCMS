@@ -1,0 +1,13 @@
+name: Hello World
+
+on:
+  push:
+    branches: ["learn-github-actions"]
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Hello World
+        run: echo "Hello, world!"
