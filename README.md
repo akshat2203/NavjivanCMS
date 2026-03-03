@@ -56,17 +56,29 @@ pip install -r requirements.txt
 ```
 
 ### 6. Configure environment variables
-Create a `.env` file in the root directory `navjivan` and set up the required environment variables for your database, secret key, etc.
-
-Example `.env`:
+Copy the template and pick an environment profile:
 
 ```bash
-DB_NAME=your_database_name
-DB_USER=your_database_user
-DB_PASSWORD=your_database_password
-DB_PORT=your_database_port
-DB_HOST=localhost
+cp navjivan/.env.example navjivan/.env
 ```
+
+Key variables:
+
+```bash
+DJANGO_ENV=development   # use `production` on server
+SECRET_KEY=change-this
+DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+POSTGRES_DB=navjivan
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST=localhost
+DB_PORT=5432
+USE_SQLITE=False         # set True for local sqlite in development
+```
+
+Settings now auto-load by environment:
+- `navjivan.settings.development` for local development.
+- `navjivan.settings.production` for production hardening (SSL, HSTS, secure cookies, strict host checks).
 ### 7. Apply migrations
 Run the following commands to set up the database schema:
 ```bash
